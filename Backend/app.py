@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import mapped_column, Mapped, relationship, DeclarativeBase
 from sqlalchemy import Integer, Text, String, ForeignKey, Boolean
 from flask_cors import CORS
+from flask_migrate import Migrate
 
 app = Flask(__name__)
 CORS(app)
@@ -17,6 +18,8 @@ class Base(DeclarativeBase):
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
+
+migrate = Migrate(app=app, db=db)
 
 
 # authentication setup 
@@ -39,8 +42,8 @@ class User(db.Model):
     is_verified: Mapped[bool] = mapped_column(Boolean, nullable=True)
 
     #relationship beteween user and job
-    job = relationship("Job", back_populates="user")
-
+    posted_job = relationship("Job", back_populates="poster")
+    taken_job = relationship("Job", back_populates="taken" )
     #relationship between review and user
     review = relationship("Review", back_populates="user")
 
@@ -61,11 +64,17 @@ class Jobs(db.Model):
     date_posted: Mapped[str] = mapped_column(String(80), nullable=False)
     date_completed: Mapped[str] = mapped_column(String(80), nullable=True)
     deadline: Mapped[str] = mapped_column(String(80), nullable=True)
-    is_completed: Mapped[bool] = mapped_column(Boolean, nullable=True)
+    # is_completed: Mapped[bool] = mapped_column(Boolean, nullable=True)
+    is_completed_employer: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
+    is_completed_employee: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
+    is_paid: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
     
     #relationship between job and user
-    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"))
-    user = relationship("User", back_populates="job")
+    poster_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"))
+    taken_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"))
+
+    poster = relationship("User", foreign_keys=[poster_id], back_populates="job")
+    taken = relationship("User", foreign_keys=[poster_id], back_populates="taken_job")
 
     def to_json(self):
 
@@ -196,7 +205,16 @@ def create_job():
         db.session.commit()
 
         return jsonify({"message": "Job successfully created"}), 200
-    
+
+@app.route('/get-profile/<int:user_id>')
+def get_profile(user_id):
+
+    user_profile = db.get_or_404(User, user_id)
+
+    return jsonify({"profile":user_profile.json(),
+                    "jobs":{
+                        [ job for job in user_profile.taken_job]
+                    }}) , 200
 
 
 
