@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import mapped_column, Mapped, relationship, DeclarativeBase
-from sqlalchemy import Integer, Text, String, ForeignKey, Boolean
+from sqlalchemy import Integer, Text, String, ForeignKey, Boolean, Float, DateTime
 from flask_cors import CORS
 from flask_migrate import Migrate
 
@@ -38,23 +38,24 @@ class User(db.Model):
     password: Mapped[str] = mapped_column(String(80), nullable=False)
     email: Mapped[str] = mapped_column(String(80), nullable=True)
     phone_number: Mapped[int] = mapped_column(Integer, nullable=False)
-    rating: Mapped[int] = mapped_column(Integer, nullable=True)
+    rating: Mapped[float] = mapped_column(Float, nullable=True)
     is_verified: Mapped[bool] = mapped_column(Boolean, nullable=True)
 
     #relationship beteween user and job
-    posted_job = relationship("Job", back_populates="poster")
-    taken_job = relationship("Job", back_populates="taken" )
+    posted_job = relationship("Jobs", back_populates="poster", foreign_keys="[Jobs.poster_id]", lazy="dynamic")
+    taken_job = relationship("Jobs", back_populates="worker", foreign_keys="[Jobs.worker_id]", lazy="dynamic")
+    
     #relationship between review and user
-    review = relationship("Review", back_populates="user")
+    review = relationship("Review", back_populates="user", foreign_keys="[Review.user_id]")
 
 
     #relationship between user and transaction
-    sent_transaction = relationship("Transaction", back_populates="sender")
-    received_transaction = relationship("Transaction", back_populates="receiver")
+    sent_transaction = relationship("Transaction", back_populates="sender", foreign_keys="[Transaction.sender_id]")
+    received_transaction = relationship("Transaction", back_populates="receiver", foreign_keys="[Transaction.receiver_id]")
 
     #relationship between reporter and reported user
-    reporter = relationship("Report", back_populates="reporter")
-    reported_user = relationship("Report", back_populates="reported_user")
+    reporter = relationship("Report", back_populates="reporter", foreign_keys="[Report.reporter_id]")
+    reported_user = relationship("Report", back_populates="reported_user", foreign_keys="[Report.reported_id]")
 
 class Jobs(db.Model):
     __tablename__ = "job"
@@ -70,11 +71,11 @@ class Jobs(db.Model):
     is_paid: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
     
     #relationship between job and user
-    poster_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"))
-    taken_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"))
+    poster_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), name="fk_job_poster")
+    worker_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), name="fk_job_taken")
 
-    poster = relationship("User", foreign_keys=[poster_id], back_populates="job")
-    taken = relationship("User", foreign_keys=[poster_id], back_populates="taken_job")
+    poster = relationship("User", foreign_keys=[poster_id], back_populates="posted_job")
+    worker = relationship("User", foreign_keys=[worker_id], back_populates="taken_job")
 
     def to_json(self):
 
@@ -94,11 +95,11 @@ class Transaction(db.Model):
     amount: Mapped[int] = mapped_column(Integer, nullable=False)
 
     #relationship between transaction and user
-    sender_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=False)
-    receiver_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=False)
+    sender_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=False, name="fk_transaction_sender")
+    receiver_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=False, name="fk_transaction_receiver")
 
     sender = relationship("User", foreign_keys=[sender_id], back_populates="sent_transaction")
-    receiver = relationship("User", foreign_keys= [receiver_id], back_populates="transaction")
+    receiver = relationship("User", foreign_keys= [receiver_id], back_populates="received_transaction")
 
 class Review(db.Model):
 
@@ -106,8 +107,8 @@ class Review(db.Model):
     review: Mapped[str] = mapped_column(Text, nullable=False)
 
     # Relationship between review and user
-    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"))
-    user = relationship("User", back_populates="review")
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), name="fk_review_user")
+    user = relationship("User", back_populates="review", foreign_keys=[user_id])
 
 
 class Report(db.Model):
@@ -115,14 +116,11 @@ class Report(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     
     #relationship between report and user
-    reporter_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"))
-    reported_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"))
+    reporter_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), name="fk_report_reporter")
+    reported_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), name="fk_report_reported")
 
-    reporter = relationship("User", foreign_keys=[reported_id], back_populates="reporter")
-    reported_user = relationship("User", foreign_keys=[reported_id], back_populates="reported")
-
-
-
+    reporter = relationship("User", foreign_keys=[reporter_id], back_populates="reporter")
+    reported_user = relationship("User", foreign_keys=[reported_id], back_populates="reported_user")
 
 
 # All Routes
@@ -220,6 +218,12 @@ def get_profile(user_id):
 if __name__ == "__main__":
 
     with app.app_context():
+
+        # job1 = Jobs(
+        #     description = "Painter",
+        #     date_posted = "January",
+        #     date_completed
+        # )
         db.create_all()
 
     app.run(debug=True)
