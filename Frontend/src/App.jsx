@@ -1,11 +1,8 @@
 
-import './App.css'
-
-
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Landingpage from "./pages/Landingpage";
-import CreateProfile from './components/CreateProfile';
-import UserProfile from './components/UserProfile';
+import JobListingPage from "./pages/JobListingPage";
+import LoginPage from "./pages/LoginPage";
 // import { createBrowserRouter, RouterProvider } from "react-router-dom";
 const router = createBrowserRouter([
   {
@@ -19,13 +16,18 @@ const router = createBrowserRouter([
    },
    {
     path: "/userprofile", element: <UserProfile />
+   },
+
+  {
+    path: "/login", element: <LoginPage />
+
   },
   // {
   //   path: "/signup", element: <SignUpPage />
   // },
-  // {
-  //   path: "/recipes", element: <ViewFullRecipeList />
-  // },
+  //{
+   // path: "/explore", element: <JobListingPage />
+  //},
   // {
   //   path: "/recipes/:recipeId", element: <RecipeDetail /> // Dynamic route for recipe details
   // },
@@ -37,11 +39,5 @@ const router = createBrowserRouter([
   // }
 ]);
 
-function App() {
-  return (
-    <RouterProvider router={router} />
-  );
-
-}
 
 export default App;
