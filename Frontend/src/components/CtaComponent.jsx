@@ -7,14 +7,14 @@ const CtaComponent = ()=>{
                 <h1 className="text-3xl font-black my-10">
                      LanceCAM   Your One Stop for Job Search and employee Finding.
                 </h1>
-                <p>
+                <p className="my-10 font-bold">
                     your frelanceing starts here
                 </p>
-                <ButtonNext label={"Explore Jobs"}/>
-                <ButtonSecondary label={"Post a job"}/>
+                
             </div>
-            <div className="actions">
-
+            <div className="actions flex gap-20">
+            <ButtonNext label={"Explore Jobs"}/>
+            <ButtonSecondary label={"Post a job"}/>
             </div>
         </div>
     )
