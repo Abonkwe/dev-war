@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@chakra-ui/react": "^3.14.2",
+    "@emotion/react": "^11.14.0",
     "@google/generative-ai": "^0.24.0",
     "@tailwindcss/vite": "^4.0.16",
     "react": "^19.0.0",
