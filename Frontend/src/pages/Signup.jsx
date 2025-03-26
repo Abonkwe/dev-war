@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-const SignUp = () => {
+const Signup = () => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -12,7 +12,7 @@ const SignUp = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
   
-  const history = useHistory(); // For redirection
+//   const history = useHistory(); // For redirection
 
   // Toggle password visibility
   const togglePasswordVisibility = () => setPasswordVisible(!passwordVisible);
@@ -230,4 +230,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;
+export default Signup;

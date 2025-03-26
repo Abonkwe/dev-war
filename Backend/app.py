@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_jwt_extended import get_jwt_identity, JWTManager, jwt_required, create_access_token, create_refresh_token
 from flask_sqlalchemy import SQLAlchemy
+from flask_admin import Admin
 from sqlalchemy.orm import DeclarativeBase
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import mapped_column, Mapped, relationship, DeclarativeBase
@@ -18,6 +19,7 @@ class Base(DeclarativeBase):
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
+admin = Admin(app, name="Admin Panel", template_mode="bootstrap4")
 
 migrate = Migrate(app=app, db=db)
 
@@ -174,8 +176,10 @@ def login():
 def get_all_jobs():
 
     all_jobs = db.session.execute(db.select(Jobs)).scalars().all()
-
-    return jsonify({"jobs": [jobs.to_json() for jobs in all_jobs] }), 200
+    if all_jobs:
+        return jsonify({"jobs": [jobs.to_json() for jobs in all_jobs] }), 200
+    else:
+        return jsonify({"data":[  {"field":"some data","field2": "somejob2"},{"field":"some data","field2": "somejob2"},{"field":"some data","field2": "somejob2"}]}),200
 
 
 @app.route('/get-job/<int:job_id>', methods=["GET"])
