@@ -31,3 +31,4 @@ export const getjobdetails = async ({setError, id})=>{
         return response.json();
     }
 }
+
