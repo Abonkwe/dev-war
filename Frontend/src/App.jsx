@@ -1,18 +1,18 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Landingpage from "./pages/Landingpage";
 import JobListingPage from "./pages/JobListingPage";
-import Login
+import LoginPage from "./pages/LoginPage";
 // import { createBrowserRouter, RouterProvider } from "react-router-dom";
 const router = createBrowserRouter([
   {
     path: "/", element: <Landingpage />
   },
   {
-    path: "/login", element: <Loginpage />
+    path: "/login", element: <LoginPage />
   },
-  {
-    path: "/signup", element: <SignUpPage />
-  },
+  // {
+  //   path: "/signup", element: <SignUpPage />
+  // },
   {
     path: "/explore", element: <JobListingPage />
   },
