@@ -212,9 +212,8 @@ def get_profile(user_id):
     user_profile = db.get_or_404(User, user_id)
 
     return jsonify({"profile":user_profile.json(),
-                    "jobs":{
-                        [ job for job in user_profile.taken_job]
-                    }}) , 200
+                    "jobs":[ job for job in user_profile.taken_job]
+                    }) , 200
 
 
 
