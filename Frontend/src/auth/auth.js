@@ -40,3 +40,37 @@ export const loginUser = async (setLoading,setErrorMessage,email,password)=>{
         setLoading(false);
       }
 };
+export const signupuser = async (name,email,phone, password, setErrorMessage, setLoading)=>{
+    const API_OPTIONS = {
+        
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                "email": email,
+                "phone_number": phone,
+             "name": name,
+              "password" : password,
+            }),
+    }
+    try {
+        const response = await fetch(`${BASE_URL}/register`, API_OPTIONS);
+
+        const data = await response.json();
+
+        if (response.ok) {
+            console.log(data);
+          return data;
+        } else {
+          setErrorMessage(data.message || 'Something went wrong. Please try again.');
+        }
+      } catch (error) {
+        setErrorMessage("Network error. Please try again.");
+        console.error('Error during sign up:', error);
+        return null;
+      } finally {
+        setLoading(false);
+        return null;
+      }
+    }

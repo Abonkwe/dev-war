@@ -7,7 +7,9 @@ import UserProfile from './components/UserProfile';
 import LoginPage from "./pages/LoginPage";
 import Signup from "./pages/Signup";
 import PostJob from "./pages/PostJob";
+import { useNavigate } from 'react-router-dom';
 import VerifyPayment from "./pages/VerifyPayment";
+
 // import { createBrowserRouter, RouterProvider } from "react-router-dom";
 const router = createBrowserRouter([
   {
@@ -32,6 +34,9 @@ const router = createBrowserRouter([
   },
   {
     path: "/verify-pay", element: <VerifyPayment/>
+  },
+  {
+    path: "/login", element: <LoginPage/>
   },
   // {
   //   path: "*", 

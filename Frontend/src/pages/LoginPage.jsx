@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-
+import { useNavigate } from 'react-router-dom';
+import { loginUser } from '../auth/auth';
 const LoginPage = () => {
     const navigator = useNavigate()
   const [email, setEmail] = useState('');
@@ -10,7 +11,7 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false); // For toggling password visibility
-  const history = useHistory(); // Using useHistory for redirection
+//   const history = useHistory(); // Using useHistory for redirection
 
   const validateForm = () => {
     let isValid = true;

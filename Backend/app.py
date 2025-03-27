@@ -32,7 +32,6 @@ jwt = JWTManager(app)
 
 
 
-# Databse Models
 class User(db.Model):
     __tablename__ = "user"
 
@@ -44,25 +43,23 @@ class User(db.Model):
     rating: Mapped[float] = mapped_column(Float, nullable=True)
     is_verified: Mapped[bool] = mapped_column(Boolean, nullable=True)
 
-    #relationship beteween user and job
-    posted_job = relationship("Jobs", back_populates="poster", foreign_keys="[Jobs.poster_id]", lazy="dynamic")
-    taken_job = relationship("Jobs", back_populates="worker", foreign_keys="[Jobs.worker_id]", lazy="dynamic")
-    
-    #relationship between review and user
-    review = relationship("Review", back_populates="user", foreign_keys="[Review.user_id]")
-
-
-    #relationship between user and transaction
-    sent_transaction = relationship("Transaction", back_populates="sender", foreign_keys="[Transaction.sender_id]")
-    received_transaction = relationship("Transaction", back_populates="receiver", foreign_keys="[Transaction.receiver_id]")
-
-    #relationship between reporter and reported user
-    reporter = relationship("Report", back_populates="reporter", foreign_keys="[Report.reporter_id]")
-    reported_user = relationship("Report", back_populates="reported_user", foreign_keys="[Report.reported_id]")
-
-
     # Relationship between user and job
-    applications = relationship("Application", back_populates="job", foreign_keys="[Application.job_id]", lazy="dynamic")
+    posted_job = relationship("Jobs", back_populates="poster", foreign_keys="Jobs.poster_id", lazy="dynamic")
+    taken_job = relationship("Jobs", back_populates="worker", foreign_keys="Jobs.worker_id", lazy="dynamic")
+    
+    # Relationship between review and user
+    reviews_received = relationship("Review", back_populates="user", foreign_keys="Review.user_id")
+
+    # Relationship between user and transaction
+    sent_transaction = relationship("Transaction", back_populates="sender", foreign_keys="Transaction.sender_id")
+    received_transaction = relationship("Transaction", back_populates="receiver", foreign_keys="Transaction.receiver_id")
+
+    # Relationship between reporter and reported user
+    reports_made = relationship("Report", back_populates="reporter", foreign_keys="Report.reporter_id")
+    reports_received = relationship("Report", back_populates="reported_user", foreign_keys="Report.reported_id")
+
+    # Relationship between user and job applications
+    job_applications = relationship("Application", back_populates="applicant", foreign_keys="Application.applicant_id", lazy="dynamic")
 
 class Jobs(db.Model):
     __tablename__ = "job"
@@ -72,25 +69,26 @@ class Jobs(db.Model):
     date_posted: Mapped[str] = mapped_column(String(80), nullable=False)
     date_completed: Mapped[str] = mapped_column(String(80), nullable=True)
     deadline: Mapped[str] = mapped_column(String(80), nullable=True)
-    # is_completed: Mapped[bool] = mapped_column(Boolean, nullable=True)
     is_completed_employer: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
     is_completed_employee: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
     is_paid: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
     
-    #relationship between job and user
+    # Foreign keys to User
     poster_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), name="fk_job_poster")
     worker_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), name="fk_job_taken")
 
+    # Remove the job_id foreign key to Application - this is the wrong direction
+    # job_id: Mapped[int] = mapped_column(Integer, ForeignKey("Application.id"))  # REMOVE THIS LINE
+
+    # Relationships
+    applications = relationship("Application", back_populates="job")
     poster = relationship("User", foreign_keys=[poster_id], back_populates="posted_job")
     worker = relationship("User", foreign_keys=[worker_id], back_populates="taken_job")
 
     def to_json(self):
-
         all_jobs = {}
-
         for column in self.__table__.columns:
             all_jobs[column.name] = getattr(self, column.name)
-    
         return all_jobs
 
 class Transaction(db.Model):
@@ -114,8 +112,9 @@ class Review(db.Model):
     review: Mapped[str] = mapped_column(Text, nullable=False)
 
     # Relationship between review and user
+    
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), name="fk_review_user")
-    user = relationship("User", back_populates="review", foreign_keys=[user_id])
+    user = relationship("User", back_populates="reviews_received", foreign_keys=[user_id])
 
 
 class Report(db.Model):
@@ -126,22 +125,24 @@ class Report(db.Model):
     reporter_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), name="fk_report_reporter")
     reported_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), name="fk_report_reported")
 
-    reporter = relationship("User", foreign_keys=[reporter_id], back_populates="reporter")
-    reported_user = relationship("User", foreign_keys=[reported_id], back_populates="reported_user")
+    reporter = relationship("User", foreign_keys=[reporter_id], back_populates="reports_made")
+    reported_user = relationship("User", foreign_keys=[reported_id], back_populates="reports_received")
 
 class Application(db.Model):
-
+    __tablename__ = "application"
+    
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     application_date: Mapped[str] = mapped_column(String(80), nullable=False)
-    is_accepted: Mapped[bool] = mapped_column(String(20), nullable=False, default=False)
+    is_accepted: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     message: Mapped[str] = mapped_column(Text, nullable=True)
 
-    # Relationship between application and User
-    application_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=False)
-    applicant = relationship("User", back_populates="job_applications")
+    # Foreign key to User (applicant)
+    applicant_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=False)
+    
+    # Foreign key to Job
+    job_id: Mapped[int] = mapped_column(Integer, ForeignKey("job.id"), nullable=False)
 
-    # Relationship between Job and application
-
+    # Relationships
     job = relationship("Jobs", back_populates="applications")
     applicant = relationship("User", back_populates="job_applications")
     
@@ -151,14 +152,9 @@ class Application(db.Model):
             "job_id": self.job_id,
             "applicant_id": self.applicant_id,
             "application_date": self.application_date,
-            "status": self.status,
+            "is_accepted": self.is_accepted,
             "message": self.message
         }
-
-
-
-
-
 # All Routes
 
 @app.route('/register', methods=["POST"])
@@ -189,11 +185,11 @@ def register():
 
 @app.route('/login', methods=["POST"])
 def login():
-    user_name = request.json.get("name")
+    user_email = request.json.get("email")
     password = request.json.get("password")
 
     with app.app_context():
-        check_user = db.session.execute(db.select(User).where(User.name==user_name)).scalar()
+        check_user = db.session.execute(db.select(User).where(User.email==user_email)).scalar()
 
         if not check_user:
             return jsonify({"message": "User does not exit"}), 401
@@ -202,7 +198,7 @@ def login():
             return jsonify({"message": "Incorrect password"}), 401
         
         if check_user and check_password_hash(check_user.password, password):
-            access_token = create_access_token(identity=user_name)
+            access_token = create_access_token(identity=user_email)
             return jsonify(access_token=access_token), 200
 
 
@@ -280,7 +276,7 @@ def is_completed_employer(job_id):
 
 @app.route('/jobs/complete-employee/<int:job_id>', methods=["PATCH"])
 @jwt_required()
-def is_completed_employer(job_id):
+def is_completed_employee(job_id):
     
     is_completed = request.json.get("is_completed_employer")
     job = db.get_or_404(User, job_id)
