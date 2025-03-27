@@ -11,8 +11,8 @@ const JobListingPage =()=>{
     const fetchAllJobs = async ()=>{
         const res = await getalljobs(setGetError);
         if (res){
-            setJobs(res.data)
-            console.log(res.data)
+            setJobs(res)
+            console.log(res)
         }else{
             return;
         }
@@ -37,7 +37,7 @@ const JobListingPage =()=>{
                { 
                 job &&
                job.map((j,i) => {
-                return <Job key={i}/>
+                return <Job info={j} key={i}/>
                     
                 })
                 }

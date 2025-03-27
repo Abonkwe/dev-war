@@ -1,5 +1,5 @@
 
-const Job =()=>{
+const Job =({info})=>{
     const applyForJob = async()=>{
 
     };
@@ -14,10 +14,7 @@ const Job =()=>{
                     </div>
                 </div>
                 <div className="description font-bold my-3">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                     Velit, ducimus, eveniet corrupti perspiciatis dicta 
-                     cumque reprehenderit quibusdam ea minima repellat soluta, sunt ipsum 
-                    sequi nesciunt eligendi molestias numquam impedit vel....
+                    {info.description}
                 </div>
                 <div className="jobtype  text-[#19995C] font-black">
                         <p className="bg-slate-300 p-1 rounded">painting</p>
