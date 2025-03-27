@@ -301,6 +301,26 @@ def is_completed_employee(job_id):
         "message": "Job marked as complete by employer"
     })
 
+@app.route('/user-jobs/<int:user_id>', methods=["GET"])
+def get_user_jobs(user_id):
+    # Get the user or return 404 if not found
+    user = db.session.get(User, user_id)
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    # Get all jobs posted by this user
+    posted_jobs = [job.to_json() for job in user.posted_job]
+    
+    # Get all jobs taken by this user
+    taken_jobs = [job.to_json() for job in user.taken_job]
+
+    return jsonify({
+        "posted_jobs": posted_jobs,
+        "taken_jobs": taken_jobs
+    }), 200
+    
+
+
 if __name__ == "__main__":
 
     with app.app_context():
