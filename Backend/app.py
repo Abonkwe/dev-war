@@ -9,7 +9,7 @@ from sqlalchemy import Integer, Text, String, ForeignKey, Boolean, Float, DateTi
 from flask_cors import CORS
 from flask_migrate import Migrate
 from datetime import datetime
-
+import json
 app = Flask(__name__)
 CORS(app)
 
@@ -61,12 +61,26 @@ class User(db.Model):
     # Relationship between user and job applications
     job_applications = relationship("Application", back_populates="applicant", foreign_keys="Application.applicant_id", lazy="dynamic")
 
+
+    def to_json(self):
+
+        user = {}
+
+        for column in self.__table__.columns:
+            user[column.name] = getattr(self, column.name)
+        
+        return user
+    
 class Jobs(db.Model):
     __tablename__ = "job"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    job_title: Mapped[str] = mapped_column(Text,nullable=False)
+    # job_type: Mapped[str] = mapped_column(Text,nullable=False)
+    location: Mapped[str] = mapped_column(Text,nullable=False)
+    contact_email: Mapped[str] = mapped_column(Text,nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
-    date_posted: Mapped[str] = mapped_column(String(80), nullable=False)
+    date_posted = db.Column(db.DateTime, default=datetime.utcnow)
     date_completed: Mapped[str] = mapped_column(String(80), nullable=True)
     deadline: Mapped[str] = mapped_column(String(80), nullable=True)
     is_completed_employer: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
@@ -74,8 +88,8 @@ class Jobs(db.Model):
     is_paid: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
     
     # Foreign keys to User
-    poster_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), name="fk_job_poster")
-    worker_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), name="fk_job_taken")
+    poster_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=True)
+    worker_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=True)
 
     # Remove the job_id foreign key to Application - this is the wrong direction
     # job_id: Mapped[int] = mapped_column(Integer, ForeignKey("Application.id"))  # REMOVE THIS LINE
@@ -90,6 +104,8 @@ class Jobs(db.Model):
         for column in self.__table__.columns:
             all_jobs[column.name] = getattr(self, column.name)
         return all_jobs
+    
+
 
 class Transaction(db.Model):
     __tablename__ = "transaction"
@@ -100,8 +116,8 @@ class Transaction(db.Model):
     amount: Mapped[int] = mapped_column(Integer, nullable=False)
 
     #relationship between transaction and user
-    sender_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=False, name="fk_transaction_sender")
-    receiver_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=False, name="fk_transaction_receiver")
+    sender_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=False)
+    receiver_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=False)
 
     sender = relationship("User", foreign_keys=[sender_id], back_populates="sent_transaction")
     receiver = relationship("User", foreign_keys= [receiver_id], back_populates="received_transaction")
@@ -113,7 +129,7 @@ class Review(db.Model):
 
     # Relationship between review and user
     
-    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), name="fk_review_user")
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"))
     user = relationship("User", back_populates="reviews_received", foreign_keys=[user_id])
 
 
@@ -122,8 +138,8 @@ class Report(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     
     #relationship between report and user
-    reporter_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), name="fk_report_reporter")
-    reported_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), name="fk_report_reported")
+    reporter_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"))
+    reported_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"))
 
     reporter = relationship("User", foreign_keys=[reporter_id], back_populates="reports_made")
     reported_user = relationship("User", foreign_keys=[reported_id], back_populates="reports_received")
@@ -206,8 +222,12 @@ def login():
 def get_all_jobs():
 
     all_jobs = db.session.execute(db.select(Jobs)).scalars().all()
+
+    # all_jobs_ = [jobs.to_json() for jobs in all_jobs, ]
+
+
     if all_jobs:
-        return jsonify({"jobs": [jobs.to_json() for jobs in all_jobs] }), 200
+        return jsonify({"jobs": [jobs.to_json() for jobs in all_jobs]}), 200
     else:
         return jsonify({"data":[  {"field":"some data","field2": "somejob2"},{"field":"some data","field2": "somejob2"},{"field":"some data","field2": "somejob2"}]}),200
 
@@ -217,20 +237,18 @@ def get_job(job_id):
 
     job = db.get_or_404(Jobs, job_id)
 
-    return jsonify({"jobs": job.to_json()}), 200
+    return jsonify({"jobs":{ job.to_json()}}), 200
 
 
 @app.route('/create-job', methods=["POST"])
-@jwt_required()
 def create_job():
-
     with app.app_context():
         new_job = Jobs(
+            poster_id = 1,
             description = request.json.get("description"),
-            date_posted = request.json.get("date_posted"),
-            date_completed = request.json.get("date_completed"),
-            deadline = request.json.get("deadline", ""),
-            is_completed = request.json.get("is_completed", "")
+            job_title = request.json.get("job_title"),
+            location= request.json.get("location"),
+            contact_email = request.json.get("contact_email"),
         )
 
         db.session.add(new_job)
