@@ -1,23 +1,25 @@
 import ButtonNext from "./ButtonNext";
 import ButtonSecondary from "./ButtonSecondary";
-const CtaComponent = ()=>{
-    return(
-        <div className="cta-main mx-40 ">
-            <div className="text">
-                <h1 className="text-3xl font-black my-10">
-                     LanceCAM   Your One Stop for Job Search and employee Finding.
+
+const CtaComponent = () => {
+    return (
+        <div className="relative h-[400px] p-10 text-white bg-cover bg-center" style={{ backgroundImage: "url('/bg.jpg')" }}>
+            {/* Overlay for faint effect */}
+            <div className="absolute inset-0 bg-black opacity-30"></div>
+            <div className="flex flex-col justify-center h-full relative z-10 text-center">
+                <h1 className="text-4xl font-extrabold my-4">
+                    Find Your Dream Job or The Perfect Candidate with LanceCAM
                 </h1>
-                <p className="my-10 font-bold">
-                    your frelanceing starts here
+                <p className="my-4 font-medium text-lg">
+                    Start your freelancing journey today with top opportunities waiting for you.
                 </p>
-                
-            </div>
-            <div className="actions flex gap-20">
-            <ButtonNext label={"Explore Jobs"}/>
-            <ButtonSecondary label={"Post a job"}/>
+                <div className="actions flex justify-center gap-5 mt-6">
+                    <ButtonNext label={"Explore Jobs"} />
+                    <ButtonSecondary label={"Post a Job"} />
+                </div>
             </div>
         </div>
-    )
+    );
 }
 
 export default CtaComponent;
