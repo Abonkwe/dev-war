@@ -7,54 +7,68 @@ import JobCard from "../components/JobCard";
 import jobs from "../data/jobs"; // Import local jobs data
 
 const JobListingPage = () => {
-    const [allJobs, setAllJobs] = useState([]); // Store all jobs, including newly added ones
+    const [jobs, setJobs] = useState([]);
+    const [getError, setGetError] = useState("");
     const [filteredJobs, setFilteredJobs] = useState([]);
-    const [filters, setFilters] = useState({ skill: "", location: "", datePosted: "" });
-    const navigate = useNavigate();
+    const [filters, setFilters] = useState({
+        skill: "",
+        location: "",
+        datePosted: "",
+    });
 
-    useEffect(() => {
-        // Initialize jobs with local data
-        setAllJobs(jobs);
-        setFilteredJobs(jobs);
-    }, []);
+    const fetchAllJobs = async () => {
+        try {
+            const res = await getalljobs();
+            if (res.jobs) {
+                setJobs(res.jobs);
+                setFilteredJobs(res.jobs);
+            }
+        } catch (err) {
+            setGetError("Failed to fetch jobs. Please try again later.");
+        }
+    };
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
-        setFilters({ ...filters, [name]: value });
+        setFilters((prevFilters) => ({
+            ...prevFilters,
+            [name]: value,
+        }));
     };
 
     const applyFilters = () => {
-        let filtered = allJobs;
-
+        let filtered = jobs;
         if (filters.skill) {
             filtered = filtered.filter((job) =>
-                job.job_title.toLowerCase().includes(filters.skill.toLowerCase())
+                job.skills.includes(filters.skill)
             );
         }
-
         if (filters.location) {
-            filtered = filtered.filter((job) =>
-                job.location.toLowerCase().includes(filters.location.toLowerCase())
+            filtered = filtered.filter(
+                (job) => job.location === filters.location
             );
         }
-
         if (filters.datePosted) {
-            filtered = filtered.filter((job) =>
-                new Date(job.date_posted) >= new Date(filters.datePosted)
+            filtered = filtered.filter(
+                (job) => new Date(job.datePosted) >= new Date(filters.datePosted)
             );
         }
-
         setFilteredJobs(filtered);
     };
 
     const handlePostJobClick = () => {
-        const isAuthenticated = !!localStorage.getItem("access_token");
-        if (isAuthenticated) {
-            navigate("/createjob");
-        } else {
-            navigate("/login"); // Redirect to login if not authenticated
-        }
+        // Navigate to post job page
     };
+
+    useEffect(() => {
+        // Initialize jobs with local data
+        setJobs(jobs);
+        setFilteredJobs(jobs);
+    }, []);
+
+    if (getError) {
+        return <div className="text-red-500 text-center mt-10">{getError}</div>;
+    }
 
     return (
         <>
