@@ -1,7 +1,7 @@
 import ButtonNext from "./ButtonNext";
 import ButtonPrimary from "./ButtonPrimary";
 import ButtonSecondary from "./ButtonSecondary";
-
+import { Link } from 'react-router-dom';
 
 const CtaComponent = () => {
     return (
@@ -16,9 +16,8 @@ const CtaComponent = () => {
                     Start your freelancing journey today with top opportunities waiting for you.
                 </p>
                 <div className="actions flex justify-center gap-5 mt-6">
-                    <ButtonNext label={"Explore Jobs"} />
-                    <ButtonSecondary label={"Post a Job"} />
-
+                   <Link to={"/explore"}> <ButtonNext label={"Explore Jobs"} /></Link>
+                    <Link to="{/postjob"}/><ButtonSecondary label={"Post a Job"} /></Link>
                 </div>
             </div>
         </div>
