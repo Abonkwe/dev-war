@@ -15,7 +15,7 @@ class User(db.model):
     is_verified: Mapped[bool] = mapped_column(Boolean, nullable=True)
 
     #relationship beteween user and job
-    job = relationship("Job", back_populates="user")
+    job = relationship("Jobs", back_populates="user")
 
     #relationship between review and user
     review = relationship("Review", back_populates="user")
@@ -30,7 +30,7 @@ class User(db.model):
     reported_user = relationship("Report", back_populates="reported_user")
 
 class Jobs(db.model):
-    __tablename__ = "user"
+    __tablename__ = "job"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     description: Mapped[str] = mapped_column(Text, nullable=False)
@@ -65,7 +65,7 @@ class Transaction(db.model):
     receiver_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=False)
 
     sender = relationship("User", foreign_keys=[sender_id], back_populates="sent_transaction")
-    receiver = relationship("User", foreign_keys= [receiver_id], back_populates="transaction")
+    receiver = relationship("User", foreign_keys= [receiver_id], back_populates="received_transaction")
 
 class Review(db.model):
 
@@ -86,4 +86,4 @@ class Report(db.Model):
     reported_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"))
 
     reporter = relationship("User", foreign_keys=[reported_id], back_populates="reporter")
-    reported_user = relationship("User", foreign_keys=[reported_id], back_populates="reported")
+    reported_user = relationship("User", foreign_keys=[reported_id], back_populates="reported_user")

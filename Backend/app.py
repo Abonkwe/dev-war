@@ -91,9 +91,6 @@ class Jobs(db.Model):
     poster_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=True)
     worker_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=True)
 
-    # Remove the job_id foreign key to Application - this is the wrong direction
-    # job_id: Mapped[int] = mapped_column(Integer, ForeignKey("Application.id"))  # REMOVE THIS LINE
-
     # Relationships
     applications = relationship("Application", back_populates="job")
     poster = relationship("User", foreign_keys=[poster_id], back_populates="posted_job")
@@ -220,104 +217,82 @@ def login():
 
 @app.route('/get-all-jobs', methods=["GET"])
 def get_all_jobs():
-
     all_jobs = db.session.execute(db.select(Jobs)).scalars().all()
-
-    # all_jobs_ = [jobs.to_json() for jobs in all_jobs, ]
-
-
     if all_jobs:
-        return jsonify({"jobs": [jobs.to_json() for jobs in all_jobs]}), 200
+        return jsonify({"jobs": [job.to_json() for job in all_jobs]}), 200
     else:
-        return jsonify({"data":[  {"field":"some data","field2": "somejob2"},{"field":"some data","field2": "somejob2"},{"field":"some data","field2": "somejob2"}]}),200
-
+        return jsonify({"jobs": []}), 200  # Return an empty list if no jobs exist
 
 @app.route('/get-job/<int:job_id>', methods=["GET"])
 def get_job(job_id):
-
     job = db.get_or_404(Jobs, job_id)
-
-    return jsonify({"jobs":{ job.to_json()}}), 200
-
+    return jsonify(job.to_json()), 200
 
 @app.route('/create-job', methods=["POST"])
+@jwt_required()  # Ensure this decorator is present
 def create_job():
-    with app.app_context():
-        new_job = Jobs(
-            poster_id = 1,
-            description = request.json.get("description"),
-            job_title = request.json.get("job_title"),
-            location= request.json.get("location"),
-            contact_email = request.json.get("contact_email"),
-        )
+    current_user = get_jwt_identity()
+    poster = db.session.execute(db.select(User).where(User.name == current_user)).scalar()
+    if not poster:
+        return jsonify({"message": "User not found"}), 404
 
-        db.session.add(new_job)
-        db.session.commit()
+    new_job = Jobs(
+        poster_id=poster.id,
+        description=request.json.get("description"),
+        job_title=request.json.get("job_title"),
+        location=request.json.get("location"),
+        contact_email=request.json.get("contact_email"),
+    )
+    db.session.add(new_job)
+    db.session.commit()
 
-        return jsonify({"message": "Job successfully created"}), 200
+    return jsonify({"message": "Job successfully created"}), 201
 
 @app.route('/get-profile/<int:user_id>', methods=["GET"])
 def get_profile(user_id):
-
     user_profile = db.get_or_404(User, user_id)
-
-    return jsonify({"profile":user_profile.json(),
-                    "jobs":[ job for job in user_profile.taken_job]
-                    }) , 200
+    return jsonify({
+        "profile": user_profile.to_json(),
+        "jobs": [job.to_json() for job in user_profile.taken_job]
+    }), 200
 
 @app.route('/jobs/complete-employer/<int:job_id>', methods=["POST"])
 @jwt_required()
 def is_completed_employer(job_id):
-    
-    is_completed = request.json.get("is_completed_employer")
-    job = db.get_or_404(User, job_id)
-
-    # get_user
+    job = db.get_or_404(Jobs, job_id)
     current_user = get_jwt_identity()
+    poster = db.session.execute(db.select(User).where(User.name == current_user)).scalar()
 
-    if job.poster_id != db.session.execute(db.select(User).where(User.name==current_user)).scalar().name:
-        return jsonify({
-            "message":"Only the job poster can mark this as complete"
-        }), 403
+    if job.poster_id != poster.id:
+        return jsonify({"message": "Only the job poster can mark this as complete"}), 403
 
     job.is_completed_employer = True
     job.date_completed = datetime.now().isoformat()
-    
+
     if job.is_completed_employer and job.is_completed_employee:
         job.is_paid = True
 
     db.session.commit()
-
-    return jsonify({
-        "message": "Job marked as complete by employer"
-    })
+    return jsonify({"message": "Job marked as complete by employer"}), 200
 
 @app.route('/jobs/complete-employee/<int:job_id>', methods=["POST"])
 @jwt_required()
 def is_completed_employee(job_id):
-    
-    is_completed = request.json.get("is_completed_employer")
-    job = db.get_or_404(User, job_id)
-
-    # get_user
+    job = db.get_or_404(Jobs, job_id)
     current_user = get_jwt_identity()
+    worker = db.session.execute(db.select(User).where(User.name == current_user)).scalar()
 
-    if job.worker_id != db.session.execute(db.select(User).where(User.name==current_user)).scalar().name:
-        return jsonify({
-            "message":"Only the job poster can mark this as complete"
-        }), 403
+    if job.worker_id != worker.id:
+        return jsonify({"message": "Only the job worker can mark this as complete"}), 403
 
-    job.is_completed_employer = True
+    job.is_completed_employee = True
     job.date_completed = datetime.now().isoformat()
-    
+
     if job.is_completed_employer and job.is_completed_employee:
         job.is_paid = True
 
     db.session.commit()
-
-    return jsonify({
-        "message": "Job marked as complete by employer"
-    })
+    return jsonify({"message": "Job marked as complete by employee"}), 200
 
 @app.route('/user-jobs/<int:user_id>', methods=["GET"])
 def get_user_jobs(user_id):
@@ -325,29 +300,20 @@ def get_user_jobs(user_id):
     user = db.session.get(User, user_id)
     if not user:
         return jsonify({"message": "User not found"}), 404
-
+    
     # Get all jobs posted by this user
     posted_jobs = [job.to_json() for job in user.posted_job]
-    
+
     # Get all jobs taken by this user
     taken_jobs = [job.to_json() for job in user.taken_job]
-
+    
     return jsonify({
         "posted_jobs": posted_jobs,
         "taken_jobs": taken_jobs
     }), 200
-    
-
 
 if __name__ == "__main__":
-
+    
     with app.app_context():
-
-        # job1 = Jobs(
-        #     description = "Painter",
-        #     date_posted = "January",
-        #     date_completed
-        # )
         db.create_all()
-
     app.run(debug=True)
