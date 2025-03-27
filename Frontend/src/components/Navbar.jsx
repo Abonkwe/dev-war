@@ -6,19 +6,23 @@ const Navbar = () => {
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
+        console.log("Menu Open:", !isMenuOpen); // Debugging line
     };
 
     return (
-        <div className="navbar flex justify-between items-center my-4 mx-5 md:mx-40">
+        <div className="navbar flex justify-between items-center my-4 mx-5 md:mx-40 relative">
             <div className="logo font-black text-[#19995C] text-xl">
                 <h1>LanceCam</h1>
             </div>
             <div className="hidden md:flex menu">
                 <ul className="flex gap-5 font-bold text-xl">
-                    <li>Home</li>
-                    <li>About</li>
-                    <li>Contacts</li>
-                    <li>FAQs</li>
+                    {["Home", "About", "Contacts", "FAQs"].map((item) => (
+                        <li key={item} className="relative group">
+                            <span className="transition duration-300 ease-in-out hover:underline md:group-hover:underline">
+                                {item}
+                            </span>
+                        </li>
+                    ))}
                 </ul>
             </div>
             <div className="postjob hidden md:block">
@@ -40,12 +44,13 @@ const Navbar = () => {
             </div>
             {/* Mobile Menu */}
             {isMenuOpen && (
-                <div className="absolute top-16 left-0 right-0 bg-white shadow-lg md:hidden">
+                <div className="absolute top-16 left-0 right-0 bg-white shadow-lg md:hidden z-50">
                     <ul className="flex flex-col gap-5 p-5 font-bold text-xl">
-                        <li>Home</li>
-                        <li>About</li>
-                        <li>Contacts</li>
-                        <li>FAQs</li>
+                        {["Home", "About", "Contacts", "FAQs"].map((item) => (
+                            <li key={item} className="hover:underline transition duration-300 ease-in-out">
+                                {item}
+                            </li>
+                        ))}
                     </ul>
                 </div>
             )}
