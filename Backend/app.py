@@ -218,10 +218,44 @@ def login():
 @app.route('/get-all-jobs', methods=["GET"])
 def get_all_jobs():
     all_jobs = db.session.execute(db.select(Jobs)).scalars().all()
-    if all_jobs:
-        return jsonify({"jobs": [job.to_json() for job in all_jobs]}), 200
-    else:
-        return jsonify({"jobs": []}), 200  # Return an empty list if no jobs exist
+    if not all_jobs:
+        # Add mock data if no jobs exist
+        mock_jobs = [
+            {
+                "job_title": "Frontend Developer",
+                "description": "Develop user interfaces for web applications.",
+                "location": "Remote",
+                "contact_email": "frontend@example.com",
+                "date_posted": datetime.utcnow().isoformat()
+            },
+            {
+                "job_title": "Backend Developer",
+                "description": "Build and maintain server-side applications.",
+                "location": "New York",
+                "contact_email": "backend@example.com",
+                "date_posted": datetime.utcnow().isoformat()
+            },
+            {
+                "job_title": "UI/UX Designer",
+                "description": "Design user-friendly interfaces and experiences.",
+                "location": "San Francisco",
+                "contact_email": "uiux@example.com",
+                "date_posted": datetime.utcnow().isoformat()
+            }
+        ]
+        for job in mock_jobs:
+            new_job = Jobs(
+                job_title=job["job_title"],
+                description=job["description"],
+                location=job["location"],
+                contact_email=job["contact_email"],
+                date_posted=datetime.fromisoformat(job["date_posted"])
+            )
+            db.session.add(new_job)
+        db.session.commit()
+        all_jobs = db.session.execute(db.select(Jobs)).scalars().all()
+
+    return jsonify({"jobs": [job.to_json() for job in all_jobs]}), 200
 
 @app.route('/get-job/<int:job_id>', methods=["GET"])
 def get_job(job_id):
