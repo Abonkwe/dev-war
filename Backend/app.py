@@ -238,7 +238,7 @@ def create_job():
 
         return jsonify({"message": "Job successfully created"}), 200
 
-@app.route('/get-profile/<int:user_id>')
+@app.route('/get-profile/<int:user_id>', methods=["GET"])
 def get_profile(user_id):
 
     user_profile = db.get_or_404(User, user_id)
@@ -247,7 +247,7 @@ def get_profile(user_id):
                     "jobs":[ job for job in user_profile.taken_job]
                     }) , 200
 
-@app.route('/jobs/complete-employer/<int:job_id>', methods=["PATCH"])
+@app.route('/jobs/complete-employer/<int:job_id>', methods=["POST"])
 @jwt_required()
 def is_completed_employer(job_id):
     
@@ -274,7 +274,7 @@ def is_completed_employer(job_id):
         "message": "Job marked as complete by employer"
     })
 
-@app.route('/jobs/complete-employee/<int:job_id>', methods=["PATCH"])
+@app.route('/jobs/complete-employee/<int:job_id>', methods=["POST"])
 @jwt_required()
 def is_completed_employee(job_id):
     
