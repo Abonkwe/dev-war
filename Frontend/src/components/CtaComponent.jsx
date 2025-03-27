@@ -17,7 +17,7 @@ const CtaComponent = () => {
                 </p>
                 <div className="actions flex justify-center gap-5 mt-6">
                    <Link to={"/explore"}> <ButtonNext label={"Explore Jobs"} /></Link>
-                    <Link to="{/postjob"}/><ButtonSecondary label={"Post a Job"} /></Link>
+                    <Link to={"/postjob"}><ButtonSecondary label={"Post a Job"} /></Link>
                 </div>
             </div>
         </div>
