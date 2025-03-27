@@ -1,6 +1,9 @@
+import React from 'react';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Landingpage from "./pages/Landingpage";
 import JobListingPage from "./pages/JobListingPage";
+import CreateProfile from './components/UpdateProfile';
+import UserProfile from './components/UserProfile';
 import LoginPage from "./pages/LoginPage";
 import Signup from "./pages/Signup";
 import PostJob from "./pages/PostJob";
@@ -8,16 +11,19 @@ import VerifyPayment from "./pages/VerifyPayment";
 // import { createBrowserRouter, RouterProvider } from "react-router-dom";
 const router = createBrowserRouter([
   {
-    path: "/", element: <Landingpage />
+    path: "/", 
+    element: <Landingpage />
   },
   {
-    path: "/login", element: <LoginPage />
+    path: "/profile", 
+    element: <CreateProfile />
   },
   {
     path: "/signup", element: <Signup />
   },
   {
-    path: "/explore", element: <JobListingPage />
+    path: "/userprofile", 
+    element: <UserProfile />
   },
   {
     path: "/postjob", element: <PostJob/>// Dynamic route for recipe details
@@ -26,11 +32,12 @@ const router = createBrowserRouter([
     path: "/verify-pay", element: <VerifyPayment/>
   },
   // {
-  //   path: "*", element: <PageNotfound />
+  //   path: "*", 
+  //   element: <PageNotfound />
   // }
 ]);
 
-function App() {
+const App = () => {
   return (
     <RouterProvider router={router}/>
   )
