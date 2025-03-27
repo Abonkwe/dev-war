@@ -4,6 +4,7 @@ import Landingpage from "./pages/Landingpage";
 import JobListingPage from "./pages/JobListingPage";
 import CreateProfile from './components/UpdateProfile';
 import UserProfile from './components/UserProfile';
+import Notification from './components/Notification';
 import LoginPage from "./pages/LoginPage";
 import PostJob from './pages/PostJob';
 
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
   {
     path:"/post",
     element: <PostJob/>
+  },
+  {
+    path:"/notification",
+    element: <Notification/>
   }
   // Additional routes can be uncommented as needed
   // {
