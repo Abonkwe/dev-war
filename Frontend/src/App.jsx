@@ -13,6 +13,8 @@ const router = createBrowserRouter([
   {
     path: "/", 
     element: <Landingpage />
+  },{
+    path: "/explore", element: <JobListingPage/>
   },
   {
     path: "/profile", 
@@ -26,7 +28,7 @@ const router = createBrowserRouter([
     element: <UserProfile />
   },
   {
-    path: "/postjob", element: <PostJob/>// Dynamic route for recipe details
+    path: "/createjob", element: <PostJob/>// Dynamic route for recipe details
   },
   {
     path: "/verify-pay", element: <VerifyPayment/>
