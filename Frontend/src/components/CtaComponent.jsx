@@ -1,5 +1,7 @@
 import ButtonNext from "./ButtonNext";
+import ButtonPrimary from "./ButtonPrimary";
 import ButtonSecondary from "./ButtonSecondary";
+
 
 const CtaComponent = () => {
     return (
@@ -16,6 +18,7 @@ const CtaComponent = () => {
                 <div className="actions flex justify-center gap-5 mt-6">
                     <ButtonNext label={"Explore Jobs"} />
                     <ButtonSecondary label={"Post a Job"} />
+
                 </div>
             </div>
         </div>

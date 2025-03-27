@@ -6,42 +6,33 @@ import CreateProfile from './components/UpdateProfile';
 import UserProfile from './components/UserProfile';
 import Notification from './components/Notification';
 import LoginPage from "./pages/LoginPage";
-import PostJob from './pages/PostJob';
+import Signup from "./pages/Signup";
+import PostJob from "./pages/PostJob";
+import { useNavigate } from 'react-router-dom';
+import VerifyPayment from "./pages/VerifyPayment";
 
+// import { createBrowserRouter, RouterProvider } from "react-router-dom";
 const router = createBrowserRouter([
   {
     path: "/", 
     element: <Landingpage />
+  },{
+    path: "/explore", element: <JobListingPage/>
   },
   {
     path: "/profile", 
     element: <CreateProfile />
   },
   {
+    path: "/signup", element: <Signup />
+  },
+  {
     path: "/userprofile", 
     element: <UserProfile />
   },
   {
-    path: "/login", 
-    element: <LoginPage />
+    path: "/createjob", element: <PostJob/>// Dynamic route for recipe details
   },
-  {
-    path:"/post",
-    element: <PostJob/>
-  },
-  {
-    path:"/notification",
-    element: <Notification/>
-  }
-  // Additional routes can be uncommented as needed
-  // {
-  //   path: "/signup", 
-  //   element: <SignUpPage />
-  // },
-  // {
-  //   path: "/explore", 
-  //   element: <JobListingPage />
-  // },
   // {
   //   path: "*", 
   //   element: <PageNotfound />
@@ -50,8 +41,8 @@ const router = createBrowserRouter([
 
 const App = () => {
   return (
-    <RouterProvider router={router} />
-  );
-};
+    <RouterProvider router={router}/>
+  )
+}
 
 export default App;

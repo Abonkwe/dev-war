@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ButtonPrimary from "./ButtonPrimary";
 
+
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 

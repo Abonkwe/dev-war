@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Link} from 'react-router-dom';
-
+import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { loginUser } from '../auth/auth';
 const LoginPage = () => {
+    const navigator = useNavigate()
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -9,7 +11,7 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false); // For toggling password visibility
-  // const history = useHistory(); // Using useHistory for redirection
+//   const history = useHistory(); // Using useHistory for redirection
 
   const validateForm = () => {
     let isValid = true;
@@ -45,42 +47,17 @@ const LoginPage = () => {
     if (validateForm()) {
       setLoading(true);
       setErrorMessage('');
-
-      try {
-        // Demo: Replace with your backend API URL and endpoint
-        const response = await fetch('https://your-backend-url.com/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email,
-            password,
-          }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-
-          // Store user data and token in localStorage
-          localStorage.setItem('user', JSON.stringify(data.user)); // Store user info
-          localStorage.setItem('token', data.token); // Store JWT token
-
-          // Optionally, you can redirect the user after login
-          history.push('/dashboard'); // Redirect to dashboard or home page
-        } else {
-          const data = await response.json();
-          setErrorMessage(data.message || 'Something went wrong. Please try again.');
+      const res = await loginUser(setLoading,setErrorMessage,email,password); //send data to backend to login user
+        if (res){
+            setLoading(false);
+            navigator("/")  //navigate to main page if login successfull
+        }else{
+            setErrorMessage("Someting went wrong please try again")
+            setLoading(false);
+            return;
         }
-      } catch (error) {
-        setErrorMessage('Network error. Please try again.');
-        console.error('Error during login:', error);
-      } finally {
-        setLoading(false);
-      }
     }
-  };
-
+  }
   return (
     <div className="flex min-h-screen items-center justify-center bg-white p-6">
       <div className="w-full max-w-md rounded-lg border border-gray-200 bg-white p-8 shadow-lg">

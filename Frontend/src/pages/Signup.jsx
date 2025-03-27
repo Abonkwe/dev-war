@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { signupuser } from "../auth/auth";
 
-const SignUp = () => {
+const Signup = () => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -12,8 +13,8 @@ const SignUp = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
   
-  const history = useHistory(); // For redirection
-
+//   const history = useHistory(); // For redirection
+    const navigator = useNavigate()
   // Toggle password visibility
   const togglePasswordVisibility = () => setPasswordVisible(!passwordVisible);
   const toggleConfirmPasswordVisibility = () => setConfirmPasswordVisible(!confirmPasswordVisible);
@@ -41,38 +42,13 @@ const SignUp = () => {
     if (validateForm()) {
       setLoading(true);
       setErrorMessage('');
-      
-      try {
-        const response = await fetch("https://your-backend-url.com/signup", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            fullName,
-            email,
-            phone,
-            password,
-          }),
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          // Redirect to login page after successful sign-up
-          history.push("/login");
-        } else {
-          setErrorMessage(data.message || 'Something went wrong. Please try again.');
-        }
-      } catch (error) {
-        setErrorMessage("Network error. Please try again.");
-        console.error('Error during sign up:', error);
-      } finally {
-        setLoading(false);
+      const res = await signupuser(fullName,email, phone, password, setErrorMessage, setLoading);
+      if (res){
+        console.log(res);
+            navigator("/login");
       }
     }
-  };
-
+  }
   return (
     <div className="flex min-h-screen items-center justify-center bg-white p-6">
       <div className="w-full max-w-md rounded-lg border border-gray-200 bg-white p-8 shadow-lg">
@@ -230,4 +206,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;
+export default Signup;
