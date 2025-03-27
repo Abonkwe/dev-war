@@ -8,6 +8,7 @@ from sqlalchemy.orm import mapped_column, Mapped, relationship, DeclarativeBase
 from sqlalchemy import Integer, Text, String, ForeignKey, Boolean, Float, DateTime
 from flask_cors import CORS
 from flask_migrate import Migrate
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
@@ -58,6 +59,10 @@ class User(db.Model):
     #relationship between reporter and reported user
     reporter = relationship("Report", back_populates="reporter", foreign_keys="[Report.reporter_id]")
     reported_user = relationship("Report", back_populates="reported_user", foreign_keys="[Report.reported_id]")
+
+
+    # Relationship between user and job
+    applications = relationship("Application", back_populates="job", foreign_keys="[Application.job_id]", lazy="dynamic")
 
 class Jobs(db.Model):
     __tablename__ = "job"
@@ -123,6 +128,35 @@ class Report(db.Model):
 
     reporter = relationship("User", foreign_keys=[reporter_id], back_populates="reporter")
     reported_user = relationship("User", foreign_keys=[reported_id], back_populates="reported_user")
+
+class Application(db.Model):
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    application_date: Mapped[str] = mapped_column(String(80), nullable=False)
+    is_accepted: Mapped[bool] = mapped_column(String(20), nullable=False, default=False)
+    message: Mapped[str] = mapped_column(Text, nullable=True)
+
+    # Relationship between application and User
+    application_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=False)
+    applicant = relationship("User", back_populates="job_applications")
+
+    # Relationship between Job and application
+
+    job = relationship("Jobs", back_populates="applications")
+    applicant = relationship("User", back_populates="job_applications")
+    
+    def to_json(self):
+        return {
+            "id": self.id,
+            "job_id": self.job_id,
+            "applicant_id": self.applicant_id,
+            "application_date": self.application_date,
+            "status": self.status,
+            "message": self.message
+        }
+
+
+
 
 
 # All Routes
@@ -217,7 +251,59 @@ def get_profile(user_id):
                     "jobs":[ job for job in user_profile.taken_job]
                     }) , 200
 
+@app.route('/jobs/complete-employer/<int:job_id>', methods=["PATCH"])
+@jwt_required()
+def is_completed_employer(job_id):
+    
+    is_completed = request.json.get("is_completed_employer")
+    job = db.get_or_404(User, job_id)
 
+    # get_user
+    current_user = get_jwt_identity()
+
+    if job.poster_id != db.session.execute(db.select(User).where(User.name==current_user)).scalar().name:
+        return jsonify({
+            "message":"Only the job poster can mark this as complete"
+        }), 403
+
+    job.is_completed_employer = True
+    job.date_completed = datetime.now().isoformat()
+    
+    if job.is_completed_employer and job.is_completed_employee:
+        job.is_paid = True
+
+    db.session.commit()
+
+    return jsonify({
+        "message": "Job marked as complete by employer"
+    })
+
+@app.route('/jobs/complete-employee/<int:job_id>', methods=["PATCH"])
+@jwt_required()
+def is_completed_employer(job_id):
+    
+    is_completed = request.json.get("is_completed_employer")
+    job = db.get_or_404(User, job_id)
+
+    # get_user
+    current_user = get_jwt_identity()
+
+    if job.worker_id != db.session.execute(db.select(User).where(User.name==current_user)).scalar().name:
+        return jsonify({
+            "message":"Only the job poster can mark this as complete"
+        }), 403
+
+    job.is_completed_employer = True
+    job.date_completed = datetime.now().isoformat()
+    
+    if job.is_completed_employer and job.is_completed_employee:
+        job.is_paid = True
+
+    db.session.commit()
+
+    return jsonify({
+        "message": "Job marked as complete by employer"
+    })
 
 if __name__ == "__main__":
 
