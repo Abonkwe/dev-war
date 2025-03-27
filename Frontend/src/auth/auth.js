@@ -23,8 +23,8 @@ export const loginUser = async (setLoading,setErrorMessage,email,password)=>{
           const data = await response.json();
 
           // Store user data and token in localStorage
-          localStorage.setItem('user', JSON.stringify(data.user)); // Store user info
-          localStorage.setItem('token', data.token); // Store JWT token
+        //   localStorage.setItem('user', JSON.stringify(data.user)); // Store user info
+          localStorage.setItem('token', data.access_token); // Store JWT token
 
         //   // Optionally, you can redirect the user after login
         //   history.push('/dashboard'); // Redirect to dashboard or home page
