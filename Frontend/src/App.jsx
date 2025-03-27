@@ -4,6 +4,7 @@ import Landingpage from "./pages/Landingpage";
 import JobListingPage from "./pages/JobListingPage";
 import CreateProfile from './components/UpdateProfile';
 import UserProfile from './components/UserProfile';
+import Notification from './components/Notification';
 import LoginPage from "./pages/LoginPage";
 import Signup from "./pages/Signup";
 import PostJob from "./pages/PostJob";
@@ -31,12 +32,6 @@ const router = createBrowserRouter([
   },
   {
     path: "/createjob", element: <PostJob/>// Dynamic route for recipe details
-  },
-  {
-    path: "/verify-pay", element: <VerifyPayment/>
-  },
-  {
-    path: "/login", element: <LoginPage/>
   },
   // {
   //   path: "*", 

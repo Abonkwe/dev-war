@@ -1,10 +1,13 @@
 import { Link } from 'react-router-dom';
 
-const ButtonPrimary = ({label, onclick }) => {
+const ButtonPrimary = ({ label, onClick }) => {
     return (
-        <button className="md:bg-[#19995C] min-w-[3em] bg-white transition-all duration-300 md:hover:bg-[#b84a62ea] hover:bg-[#b84a6277] hover:shadow-md md:text-white text-[#b84A62] font-bold p-3 rounded-sm text-center inline-block" onClick={onclick}>
+        <button
+            className="md:bg-[#19995C] min-w-[3em] bg-white transition-all duration-300 hover:bg-[#19995be8] hover:shadow-md text-white font-bold p-3 rounded-sm text-center inline-block"
+            onClick={onClick}
+        >
             {label}
-  </button>  
+        </button>
     );
 };
 
