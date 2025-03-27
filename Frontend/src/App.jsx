@@ -3,6 +3,8 @@ import Landingpage from "./pages/Landingpage";
 import JobListingPage from "./pages/JobListingPage";
 import LoginPage from "./pages/LoginPage";
 import Signup from "./pages/Signup";
+import PostJob from "./pages/PostJob";
+import VerifyPayment from "./pages/VerifyPayment";
 // import { createBrowserRouter, RouterProvider } from "react-router-dom";
 const router = createBrowserRouter([
   {
@@ -17,12 +19,12 @@ const router = createBrowserRouter([
   {
     path: "/explore", element: <JobListingPage />
   },
-  // {
-  //   path: "/recipes/:recipeId", element: <RecipeDetail /> // Dynamic route for recipe details
-  // },
-  // {
-  //   path: "/aichat", element: <AiChat/>
-  // },
+  {
+    path: "/postjob", element: <PostJob/>// Dynamic route for recipe details
+  },
+  {
+    path: "/verify-pay", element: <VerifyPayment/>
+  },
   // {
   //   path: "*", element: <PageNotfound />
   // }
