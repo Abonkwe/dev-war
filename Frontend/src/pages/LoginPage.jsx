@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../auth/auth';
+
 const LoginPage = () => {
-    const navigator = useNavigate()
+  const navigator = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -11,7 +13,13 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false); // For toggling password visibility
-//   const history = useHistory(); // Using useHistory for redirection
+
+  useEffect(() => {
+    if (location.state) {
+      setEmail(location.state.email || '');
+      setPassword(location.state.password || '');
+    }
+  }, [location.state]);
 
   const validateForm = () => {
     let isValid = true;
@@ -47,17 +55,21 @@ const LoginPage = () => {
     if (validateForm()) {
       setLoading(true);
       setErrorMessage('');
-      const res = await loginUser(setLoading,setErrorMessage,email,password); //send data to backend to login user
-        if (res){
-            setLoading(false);
-            navigator("/")  //navigate to main page if login successfull
-        }else{
-            setErrorMessage("Someting went wrong please try again")
-            setLoading(false);
-            return;
-        }
+      const res = await loginUser(setLoading, setErrorMessage, email, password); //send data to backend to login user
+      if (res) {
+        setLoading(false);
+        navigator("/"); // Navigate to main page if login successful
+        localStorage.setItem("access_token", res.access_token);
+        localStorage.setItem("user", JSON.stringify({ name: email.split("@")[0], email: email }));
+        window.location.reload(); // Force re-render to update the navbar
+      } else {
+        setErrorMessage("Something went wrong, please try again");
+        setLoading(false);
+        return;
+      }
     }
-  }
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-white p-6">
       <div className="w-full max-w-md rounded-lg border border-gray-200 bg-white p-8 shadow-lg">

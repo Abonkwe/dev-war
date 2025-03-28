@@ -1,31 +1,25 @@
-
-const Job =({info})=>{
-    const applyForJob = async()=>{
-
-    };
-    return(
-        <div className="job shadow-xl rounded-sm p-7 lg:w-[30%]">
-            <div className="profile ">
-                <div className="profile-info my-3 bg-slate-200 p-2 rounded flex items-center gap-4">
-                    <img src="user-black.svg" alt="" className="w-13" />
-                    <div className="names flex flex-col">
-                        <p  className="font-bold">Tayu Prosper</p>
-                        <p className="text-slate-400">email@someone.com</p>
-                    </div>
-                </div>
-                <div className="description font-bold my-3">
-                    {info.description}
-                </div>
-                <div className="jobtype  text-[#19995C] font-black">
-                        <p className="bg-slate-300 p-1 rounded">painting</p>
-                </div>
-                <div className="actions py-5 flex justify-around">
-                    <button className="bg-[#19995C] p-3 rounded-sm  font-bold text-white" onClick={applyForJob}>Apply</button>
-                    <button className="bg-[#19995C] p-3 rounded-sm  font-bold text-white">Save for later</button>
-                </div>
+const JobCard = ({ info }) => {
+    return (
+        <div className="job shadow-lg rounded-lg p-6 bg-white lg:w-[30%]">
+            <div className="profile-info mb-4">
+                <h3 className="text-xl font-bold text-[#19995C]">{info.job_title}</h3>
+                <p className="text-gray-600">{info.description}</p>
+            </div>
+            <div className="details text-sm text-gray-500">
+                <p><strong>Location:</strong> {info.location}</p>
+                <p><strong>Posted on:</strong> {new Date(info.date_posted).toLocaleDateString()}</p>
+                <p><strong>Contact:</strong> {info.contact_email}</p>
+            </div>
+            <div className="actions mt-4 flex justify-between">
+                <button className="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700">
+                    Apply Now
+                </button>
+                <button className="bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400">
+                    Save for Later
+                </button>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default Job;
+export default JobCard;

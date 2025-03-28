@@ -1,13 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ButtonPrimary from "./ButtonPrimary";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const accessToken = localStorage.getItem("access_token");
+        setIsAuthenticated(!!accessToken); // Check if the user is authenticated
+    }, []);
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
-        console.log("Menu Open:", !isMenuOpen); // Debugging line
+    };
+
+    const handlePostJobClick = () => {
+        if (isAuthenticated) {
+            navigate("/createjob");
+        } else {
+            navigate("/login"); // Redirect to login if not authenticated
+        }
     };
 
     return (
@@ -17,17 +31,27 @@ const Navbar = () => {
             </div>
             <div className="hidden md:flex menu">
                 <ul className="flex gap-5 font-bold text-xl">
-                    {["Home", "About", "Contacts", "FAQs"].map((item) => (
-                        <li key={item} className="relative group">
-                            <span className="transition duration-300 ease-in-out hover:underline md:group-hover:underline">
-                                {item}
-                            </span>
-                        </li>
-                    ))}
+                    <li>
+                        <Link to="/" className="hover:underline">Home</Link>
+                    </li>
+                    <li>
+                        <Link to="/explore" className="hover:underline">Explore</Link>
+                    </li>
+                    <li>
+                        <Link to="/profile" className="hover:underline">Profile</Link>
+                    </li>
+                    <li>
+                        <Link to="/notifications" className="hover:underline">Notifications</Link>
+                    </li>
                 </ul>
             </div>
             <div className="postjob hidden md:block">
-                <ButtonPrimary label={"Post a Job"} />
+                <button
+                    onClick={handlePostJobClick}
+                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                >
+                    Post a Job
+                </button>
             </div>
             {/* Hamburger Icon for Mobile */}
             <div className="md:hidden">
@@ -47,11 +71,19 @@ const Navbar = () => {
             {isMenuOpen && (
                 <div className="absolute top-16 left-0 right-0 bg-white shadow-lg md:hidden z-50">
                     <ul className="flex flex-col gap-5 p-5 font-bold text-xl">
-                        {["Home", "About", "Contacts", "FAQs"].map((item) => (
-                            <li key={item} className="hover:underline transition duration-300 ease-in-out">
-                                {item}
+                        {["Home", "Explore", "Profile", "Notifications"].map((item, index) => (
+                            <li key={index} className="hover:underline transition duration-300 ease-in-out">
+                                <Link to={`/${item.toLowerCase()}`} className="block">{item}</Link>
                             </li>
                         ))}
+                        <li>
+                            <button
+                                onClick={handlePostJobClick}
+                                className="block px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 text-center"
+                            >
+                                Post a Job
+                            </button>
+                        </li>
                     </ul>
                 </div>
             )}

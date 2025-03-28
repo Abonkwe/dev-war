@@ -1,8 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
 
 const UserProfile = () => {
   const [activeTab, setActiveTab] = useState("active");
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser) {
+      setUser(storedUser);
+    }
+  }, []);
 
   const [activeJobs, setActiveJobs] = useState([
     { id: 1, title: "Web Developer", description: "Build a portfolio website", type: "Freelance" },
@@ -33,8 +41,8 @@ const UserProfile = () => {
           <div className="flex items-center">
             <img src="/profile.jpg" alt="Profile" className="w-20 h-20 rounded-full object-cover border-2 border-gray-300" />
             <div className="ml-4 text-left">
-              <h3 className="text-2xl font-semibold text-gray-800">Username</h3>
-              <p className="text-gray-600">email@gmail.com</p>
+              <h3 className="text-2xl font-semibold text-gray-800">{user ? user.name : "Username"}</h3>
+              <p className="text-gray-600">{user ? user.email : "email@gmail.com"}</p>
             </div>
           </div>
           <div className="space-x-2">

@@ -11,7 +11,7 @@ from flask_migrate import Migrate
 from datetime import datetime
 import json
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})  # Allow requests from the frontend origin
 
 # Databse setup
 class Base(DeclarativeBase):
@@ -218,44 +218,10 @@ def login():
 @app.route('/get-all-jobs', methods=["GET"])
 def get_all_jobs():
     all_jobs = db.session.execute(db.select(Jobs)).scalars().all()
-    if not all_jobs:
-        # Add mock data if no jobs exist
-        mock_jobs = [
-            {
-                "job_title": "Frontend Developer",
-                "description": "Develop user interfaces for web applications.",
-                "location": "Remote",
-                "contact_email": "frontend@example.com",
-                "date_posted": datetime.utcnow().isoformat()
-            },
-            {
-                "job_title": "Backend Developer",
-                "description": "Build and maintain server-side applications.",
-                "location": "New York",
-                "contact_email": "backend@example.com",
-                "date_posted": datetime.utcnow().isoformat()
-            },
-            {
-                "job_title": "UI/UX Designer",
-                "description": "Design user-friendly interfaces and experiences.",
-                "location": "San Francisco",
-                "contact_email": "uiux@example.com",
-                "date_posted": datetime.utcnow().isoformat()
-            }
-        ]
-        for job in mock_jobs:
-            new_job = Jobs(
-                job_title=job["job_title"],
-                description=job["description"],
-                location=job["location"],
-                contact_email=job["contact_email"],
-                date_posted=datetime.fromisoformat(job["date_posted"])
-            )
-            db.session.add(new_job)
-        db.session.commit()
-        all_jobs = db.session.execute(db.select(Jobs)).scalars().all()
-
-    return jsonify({"jobs": [job.to_json() for job in all_jobs]}), 200
+    if all_jobs:
+        return jsonify({"jobs": [job.to_json() for job in all_jobs]}), 200
+    else:
+        return jsonify({"jobs": []}), 200  # Return an empty list if no jobs exist
 
 @app.route('/get-job/<int:job_id>', methods=["GET"])
 def get_job(job_id):
@@ -263,24 +229,22 @@ def get_job(job_id):
     return jsonify(job.to_json()), 200
 
 @app.route('/create-job', methods=["POST"])
-@jwt_required()  # Ensure this decorator is present
 def create_job():
-    current_user = get_jwt_identity()
-    poster = db.session.execute(db.select(User).where(User.name == current_user)).scalar()
-    if not poster:
-        return jsonify({"message": "User not found"}), 404
+    try:
+        new_job = Jobs(
+            description=request.json.get("description"),
+            job_title=request.json.get("job_title"),
+            location=request.json.get("location"),
+            contact_email=request.json.get("contact_email"),
+            # Add price_range handling
+            price_range=request.json.get("price_range")
+        )
+        db.session.add(new_job)
+        db.session.commit()
 
-    new_job = Jobs(
-        poster_id=poster.id,
-        description=request.json.get("description"),
-        job_title=request.json.get("job_title"),
-        location=request.json.get("location"),
-        contact_email=request.json.get("contact_email"),
-    )
-    db.session.add(new_job)
-    db.session.commit()
-
-    return jsonify({"message": "Job successfully created"}), 201
+        return jsonify({"message": "Job successfully created"}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/get-profile/<int:user_id>', methods=["GET"])
 def get_profile(user_id):

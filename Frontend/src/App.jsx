@@ -8,44 +8,54 @@ import Notification from './components/Notification';
 import LoginPage from "./pages/LoginPage";
 import Signup from "./pages/Signup";
 import PostJob from "./pages/PostJob";
-import { useNavigate } from 'react-router-dom';
 import VerifyPayment from "./pages/VerifyPayment";
 
-// import { createBrowserRouter, RouterProvider } from "react-router-dom";
 const router = createBrowserRouter([
   {
-    path: "/", 
+    path: "/",
     element: <Landingpage />
-  },{
-    path: "/explore", element: <JobListingPage/>
   },
   {
-    path: "/profile", 
+    path: "/explore",
+    element: <JobListingPage />
+  },
+  {
+    path: "/profile",
     element: <CreateProfile />
   },
   {
-    path: "/signup", element: <Signup />
+    path: "/signup",
+    element: <Signup />
   },
   {
     path: "/login", element: <LoginPage/>
   },
   {
-    path: "/userprofile", 
+    path: "/userprofile",
     element: <UserProfile />
   },
   {
-    path: "/createjob", element: <PostJob/>// Dynamic route for recipe details
+    path: "/createjob",
+    element: <PostJob />
   },
-  // {
-  //   path: "*", 
-  //   element: <PageNotfound />
-  // }
+  {
+    path: "/login",
+    element: <LoginPage />
+  },
+  {
+    path: "/notifications",
+    element: <Notification />
+  },
+  {
+    path: "/verifypayment",
+    element: <VerifyPayment />
+  }
 ]);
 
 const App = () => {
   return (
-    <RouterProvider router={router}/>
-  )
-}
+    <RouterProvider router={router} />
+  );
+};
 
 export default App;

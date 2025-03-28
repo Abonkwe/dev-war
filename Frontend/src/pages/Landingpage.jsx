@@ -1,4 +1,4 @@
-import Navbar from "../components/Navbar";
+import Navbar from "../components/NavBar";
 import CtaComponent from "../components/CtaComponent";
 import Trusted from "../components/Trusted";
 import JobCategoryPage from "../components/JobCategory";
@@ -9,15 +9,12 @@ const Landingpage = () => {
         <>
             <Navbar />
             <CtaComponent />
-            <Trusted/>
-            <JobCategoryPage/>
-            <CommentsSection/>
-            <Footer/>
+            <Trusted />
+            <JobCategoryPage />
+            <CommentsSection />
+            <Footer />
         </>
     )
-
-
 }
-
 
 export default Landingpage;
