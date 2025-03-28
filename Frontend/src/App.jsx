@@ -28,7 +28,8 @@ const router = createBrowserRouter([
     element: <Signup />
   },
   {
-    path: "/login", element: <LoginPage/>
+    path: "/login",
+    element: <LoginPage />
   },
   {
     path: "/userprofile",
@@ -37,10 +38,6 @@ const router = createBrowserRouter([
   {
     path: "/createjob",
     element: <PostJob />
-  },
-  {
-    path: "/login",
-    element: <LoginPage />
   },
   {
     path: "/notifications",

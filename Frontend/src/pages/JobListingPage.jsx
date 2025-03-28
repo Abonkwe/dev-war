@@ -1,32 +1,46 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/NavBar";
 import Footer from "../components/Footer";
-import ButtonPrimary from "../components/ButtonPrimary";
-import { useNavigate } from "react-router-dom";
 import JobCard from "../components/JobCard";
-import jobs from "../data/jobs"; // Import local jobs data
+// Remove the import of local jobs data, you should use the api instead.
+// import jobs from "../data/jobs";
+import { useNavigate } from "react-router-dom";
 
 const JobListingPage = () => {
-    const [jobs, setJobs] = useState([]);
-    const [getError, setGetError] = useState("");
+    const [jobs, setJobs] = useState([]); // Store all jobs
     const [filteredJobs, setFilteredJobs] = useState([]);
     const [filters, setFilters] = useState({
         skill: "",
         location: "",
         datePosted: "",
     });
+    const [getError, setGetError] = useState("");
+    const navigate = useNavigate();
 
     const fetchAllJobs = async () => {
         try {
-            const res = await getalljobs();
-            if (res.jobs) {
-                setJobs(res.jobs);
-                setFilteredJobs(res.jobs);
+            // replace the getalljobs() function with your real api call
+            // Example of an API call, replace it with yours.
+            const response = await fetch('/api/jobs');
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            
+            if (data) {
+                // Assuming the response has a `jobs` array
+                setJobs(data);
+                setFilteredJobs(data);
             }
         } catch (err) {
+            console.error("Failed to fetch jobs:", err);
             setGetError("Failed to fetch jobs. Please try again later.");
         }
     };
+
+    useEffect(() => {
+        fetchAllJobs(); // Call the API function when the component mounts
+    }, []);
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
@@ -38,33 +52,42 @@ const JobListingPage = () => {
 
     const applyFilters = () => {
         let filtered = jobs;
+
+        // Filter by skill
         if (filters.skill) {
             filtered = filtered.filter((job) =>
-                job.skills.includes(filters.skill)
+              // Assuming job.skills is an array of strings or the job title if not
+              (Array.isArray(job.skills) ? job.skills : [job.job_title || '']).some((skill) =>
+                skill.toLowerCase().includes(filters.skill.toLowerCase())
+              )
             );
         }
+
+        // Filter by location
         if (filters.location) {
-            filtered = filtered.filter(
-                (job) => job.location === filters.location
+            filtered = filtered.filter((job) =>
+                job.location.toLowerCase().includes(filters.location.toLowerCase())
             );
         }
+
+        // Filter by date posted
         if (filters.datePosted) {
-            filtered = filtered.filter(
-                (job) => new Date(job.datePosted) >= new Date(filters.datePosted)
+            filtered = filtered.filter((job) =>
+                new Date(job.date_posted) >= new Date(filters.datePosted)
             );
         }
+
         setFilteredJobs(filtered);
     };
 
     const handlePostJobClick = () => {
-        // Navigate to post job page
+        const isAuthenticated = !!localStorage.getItem("access_token");
+        if (isAuthenticated) {
+            navigate("/createjob");
+        } else {
+            navigate("/login");
+        }
     };
-
-    useEffect(() => {
-        // Initialize jobs with local data
-        setJobs(jobs);
-        setFilteredJobs(jobs);
-    }, []);
 
     if (getError) {
         return <div className="text-red-500 text-center mt-10">{getError}</div>;
