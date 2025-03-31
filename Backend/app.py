@@ -237,7 +237,7 @@ def create_job():
             location=request.json.get("location"),
             contact_email=request.json.get("contact_email"),
             # Add price_range handling
-            price_range=request.json.get("price_range")
+            # price_range=request.json.get("price_range")
         )
         db.session.add(new_job)
         db.session.commit()
@@ -309,6 +309,9 @@ def get_user_jobs(user_id):
         "posted_jobs": posted_jobs,
         "taken_jobs": taken_jobs
     }), 200
+
+
+
 
 if __name__ == "__main__":
     

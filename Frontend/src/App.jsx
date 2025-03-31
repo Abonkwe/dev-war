@@ -3,7 +3,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Landingpage from "./pages/Landingpage";
 import JobListingPage from "./pages/JobListingPage";
 import CreateProfile from './components/UpdateProfile';
-import UserProfile from './components/UserProfile';
+import UserProfile from './pages/UserProfile';
 import Notification from './components/Notification';
 import LoginPage from "./pages/LoginPage";
 import Signup from "./pages/Signup";
@@ -44,7 +44,7 @@ const router = createBrowserRouter([
     element: <Notification />
   },
   {
-    path: "/verifypayment",
+    path: "/verify-payment",
     element: <VerifyPayment />
   }
 ]);

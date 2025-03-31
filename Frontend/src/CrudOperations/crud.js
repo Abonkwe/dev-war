@@ -37,7 +37,7 @@ export const getjobdetails = async ({ setError, id }) => {
     }
 };
 
-export const Create_job = async (description, job_title, job_type, location, contact_email) => {
+export const Create_job = async (description, job_title, location, contact_email) => {
     const API_OPTIONS = {
         method: 'POST',
         headers: {
@@ -46,7 +46,6 @@ export const Create_job = async (description, job_title, job_type, location, con
         body: JSON.stringify({
             description,
             job_title,
-            job_type,
             location,
             contact_email,
         })
@@ -60,3 +59,24 @@ export const Create_job = async (description, job_title, job_type, location, con
         return false;
     }
 };
+
+
+export const get_my_jobs = async ()=>{
+   const  API_OPTIONS ={
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json",
+        }
+    }
+
+    const res = await fetch(`${BASE_URL}/user-jobs/1`, API_OPTIONS)
+
+    if(res.ok){
+        const data = await res.json();
+        // console.log(data)
+        return data;
+    }else{
+        console.log(res.text);
+        return null;
+    }
+}

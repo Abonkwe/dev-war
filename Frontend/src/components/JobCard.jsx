@@ -1,6 +1,6 @@
 const JobCard = ({ info }) => {
     return (
-        <div className="job shadow-lg rounded-lg p-6 bg-white lg:w-[30%]">
+        <div className="job shadow-lg rounded-lg p-6 bg-white lg:w-[30%] my-4 border">
             <div className="profile-info mb-4">
                 <h3 className="text-xl font-bold text-[#19995C]">{info.job_title}</h3>
                 <p className="text-gray-600">{info.description}</p>

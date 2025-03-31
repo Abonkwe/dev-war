@@ -1,4 +1,4 @@
-import Navbar from "../components/NavBar";
+import Navbar from "../components/Navbar";
 import CtaComponent from "../components/CtaComponent";
 import Trusted from "../components/Trusted";
 import JobCategoryPage from "../components/JobCategory";

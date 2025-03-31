@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Navbar from "../components/NavBar";
+import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import JobCard from "../components/JobCard";
 // Remove the import of local jobs data, you should use the api instead.
@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 const JobListingPage = () => {
     const [jobs, setJobs] = useState([]); // Store all jobs
     const [filteredJobs, setFilteredJobs] = useState([]);
+    const [isFiltered, setIsFiltered] = useState(false);
     const [filters, setFilters] = useState({
         skill: "",
         location: "",
@@ -21,7 +22,7 @@ const JobListingPage = () => {
         try {
             // replace the getalljobs() function with your real api call
             // Example of an API call, replace it with yours.
-            const response = await fetch('/api/jobs');
+            const response = await fetch('http://127.0.0.1:5000/get-all-jobs');
             if (!response.ok) {
               throw new Error('Network response was not ok');
             }
@@ -29,8 +30,11 @@ const JobListingPage = () => {
             
             if (data) {
                 // Assuming the response has a `jobs` array
+                // setIsFiltered(false)
+                console.log(data)
                 setJobs(data);
-                setFilteredJobs(data);
+                // setFilteredJobs(data);
+                // applyFilters()
             }
         } catch (err) {
             console.error("Failed to fetch jobs:", err);
@@ -39,34 +43,42 @@ const JobListingPage = () => {
     };
 
     useEffect(() => {
-        fetchAllJobs(); // Call the API function when the component mounts
+        fetchAllJobs(); // Call the API function when the component mounts;
     }, []);
 
     const handleFilterChange = (e) => {
+        setIsFiltered(true);
         const { name, value } = e.target;
         setFilters((prevFilters) => ({
             ...prevFilters,
             [name]: value,
         }));
+        applyFilters();
     };
 
-    const applyFilters = () => {
-        let filtered = jobs;
 
+    const applyFilters = () => {
+        // filters.array.forEach(element => {
+        // console.log(element.value)
+        // });
+        let filtered = jobs.jobs;
+        if (!isFiltered){
+            console.log("no filters selected!!")
+            setFilteredJobs(filtered);
+        }else{
+        // console.log(filtered);
         // Filter by skill
         if (filters.skill) {
-            filtered = filtered.filter((job) =>
+            filtered = filtered.filter((job) =>{
               // Assuming job.skills is an array of strings or the job title if not
-              (Array.isArray(job.skills) ? job.skills : [job.job_title || '']).some((skill) =>
-                skill.toLowerCase().includes(filters.skill.toLowerCase())
-              )
-            );
-        }
+                   return  job.skill.toLowerCase().includes(filters.skill.toLowerCase())
+               }
+             )}
 
         // Filter by location
         if (filters.location) {
-            filtered = filtered.filter((job) =>
-                job.location.toLowerCase().includes(filters.location.toLowerCase())
+            filtered = filtered.filter((job) =>{
+                return job.location.toLowerCase().includes(filters.location.toLowerCase())}
             );
         }
 
@@ -78,6 +90,7 @@ const JobListingPage = () => {
         }
 
         setFilteredJobs(filtered);
+    }
     };
 
     const handlePostJobClick = () => {
@@ -91,6 +104,16 @@ const JobListingPage = () => {
 
     if (getError) {
         return <div className="text-red-500 text-center mt-10">{getError}</div>;
+    }
+
+    const removeAllFilters = ()=>{
+        setFilters(()=> ({
+            datePosted: "",
+            location: "",
+            skill: ""
+        }))
+
+        applyFilters();
     }
 
     return (
@@ -123,14 +146,15 @@ const JobListingPage = () => {
                             className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
                         />
                         <button
-                            onClick={applyFilters}
+                            onClick={removeAllFilters}
                             className="bg-green-600 text-white font-bold py-2 px-4 rounded-md hover:bg-green-700 transition duration-200"
                         >
-                            Apply Filters
+                            Remove Filters
                         </button>
                     </div>
                 </div>
-                <div className="post-job flex justify-center my-6">
+                <div className="post-job flex justify-between my-6">
+                    <h1>{filteredJobs.length} Total Jobs Available</h1>
                     <button
                         onClick={handlePostJobClick}
                         className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
@@ -140,6 +164,7 @@ const JobListingPage = () => {
                 </div>
                 <div className="jobs w-[100%] lg:flex lg:flex-wrap gap-5">
                     {filteredJobs.length > 0 ? (
+                        // applyFilters();
                         filteredJobs.map((job, index) => (
                             <JobCard info={job} key={index} />
                         ))

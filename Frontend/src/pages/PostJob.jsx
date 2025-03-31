@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Create_job } from '../CrudOperations/crud';
 
 const townsInCameroon = [
   "Douala", "Yaoundé", "Bamenda", "Buea", "Limbe", "Kribi", "Garoua", "Maroua",
@@ -27,22 +28,13 @@ const PostJob = () => {
   const createJobHandler = async (e) => {
     e.preventDefault();
     setLoading(true);
-
-    try {
-      const newJob = {
-        ...formData,
-        date_posted: new Date().toISOString(),
-      };
-
-      // Simulate adding the job to the backend
-      setTimeout(() => {
-        setLoading(false);
-        navigate("/explore", { state: { newJob } }); // Pass the new job to JobListingPage
-      }, 1000);
-    } catch (err) {
-      setError("Failed to create job. Please try again.");
-      setLoading(false);
+    const res = await Create_job(formData.description, formData.job_title,formData.location, formData.contact_email)
+    if (res){
+      navigate("/profile");
+    }else{
+      setError("Failed to post job, please try again!!");
     }
+    setLoading(false)
   };
 
   return (

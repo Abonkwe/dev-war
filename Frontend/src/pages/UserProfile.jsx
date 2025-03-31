@@ -1,29 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
+import { get_my_jobs } from "../CrudOperations/crud";
 
 const UserProfile = () => {
   const [activeTab, setActiveTab] = useState("active");
   const [user, setUser] = useState(null);
+const [fetchError, setFetchError] = useState("");
+  const [activeJobs, setActiveJobs] = useState([]);
 
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) {
-      setUser(storedUser);
-    }
-  }, []);
+  const [postedJobs, setPostedJobs] = useState([]);
 
-  const [activeJobs, setActiveJobs] = useState([
-    { id: 1, title: "Web Developer", description: "Build a portfolio website", type: "Freelance" },
-    { id: 2, title: "Graphic Designer", description: "Design a company logo", type: "Design" },
-  ]);
-
-  const [postedJobs, setPostedJobs] = useState([
-    { id: 3, title: "SEO Specialist", description: "Improve search rankings", type: "Marketing" },
-  ]);
-
-  const [completedJobs, setCompletedJobs] = useState([
-    { id: 4, title: "Mobile App Developer", description: "Create an iOS app", type: "Development" },
-  ]);
+  const [completedJobs, setCompletedJobs] = useState([]);
 
   const markAsCompleted = (jobId) => {
     const jobToMove = activeJobs.find((job) => job.id === jobId);
@@ -32,6 +19,28 @@ const UserProfile = () => {
       setCompletedJobs([...completedJobs, jobToMove]);
     }
   };
+
+  const getAllJobs = async ()=>{
+    const data = await get_my_jobs();
+    if (!data){
+      setFetchError("Failed to fetch get your Jobs");
+    }else{
+      console.log(data.posted_jobs);
+      setPostedJobs(data.posted_jobs);
+      console.log(postedJobs);
+      setActiveJobs(data.taken_jobs);
+      // console.log(activeJobs);
+    }
+  }
+
+  const fetchAllData = async ()=>{
+      await getAllJobs();
+      // await getPostedJobs();
+
+  }
+  useEffect(() => {
+    fetchAllData();
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -81,11 +90,12 @@ const UserProfile = () => {
             <div>
               <h3 className="text-lg font-semibold text-green-600">Active Jobs</h3>
               {activeJobs.length > 0 ? (
-                activeJobs.map((job) => (
-                  <div key={job.id} className="bg-gray-100 p-4 rounded-lg shadow-md mb-3">
-                    <h4 className="text-lg font-semibold">{job.title}</h4>
+                activeJobs.map((job, i) => (
+                  // {console.log(job)}
+                  <div key={i} className="bg-gray-100 p-4 rounded-lg shadow-md mb-3">
+                    <h4 className="text-lg font-semibold">{job.job_title}</h4>
                     <p className="text-gray-600">{job.description}</p>
-                    <span className="text-sm bg-blue-200 text-blue-800 px-2 py-1 rounded">{job.type}</span>
+                    <span className="text-sm bg-blue-200 text-blue-800 px-2 py-1 rounded">{job.date_posted}</span>
                     <button
                       onClick={() => markAsCompleted(job.id)}
                       className="block mt-2 px-3 py-1 bg-green-500 text-white rounded-md hover:bg-green-600 transition"
@@ -106,9 +116,9 @@ const UserProfile = () => {
               {postedJobs.length > 0 ? (
                 postedJobs.map((job) => (
                   <div key={job.id} className="bg-gray-100 p-4 rounded-lg shadow-md mb-3">
-                    <h4 className="text-lg font-semibold">{job.title}</h4>
+                    <h4 className="text-lg font-semibold">{job.job_title}</h4>
                     <p className="text-gray-600">{job.description}</p>
-                    <span className="text-sm bg-yellow-200 text-yellow-800 px-2 py-1 rounded">{job.type}</span>
+                    <span className="text-sm bg-yellow-200 text-yellow-800 px-2 py-1 rounded">{job.contact_email}</span>
                   </div>
                 ))
               ) : (
