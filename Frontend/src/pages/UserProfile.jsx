@@ -43,7 +43,7 @@ const [fetchError, setFetchError] = useState("");
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen px-40 flex flex-col">
       <div className="flex-grow p-6 bg-white shadow-lg rounded-xl">
         {/* Profile Header */}
         <div className="flex md:flex-row items-center justify-between border-b pb-4">
@@ -63,21 +63,21 @@ const [fetchError, setFetchError] = useState("");
         </div>
 
         {/* Tabs Navigation */}
-        <div className="flex justify-center mt-5 space-x-5">
+        <div className="flex justify-between mt-5 px-30 border-b-7 border-slate-500 border-b-opacity-3">
           <button
-            className={`py-2 px-4 rounded-md ${activeTab === "active" ? "bg-green-600 text-white" : "bg-gray-200"}`}
+            className={`py-2 px-4 font-bold text-xl bg-transparent  ${activeTab === "active" ? " text-[#19995C] border-b-7 border-b-[#19995c]": "text-slate-500"}`}
             onClick={() => setActiveTab("active")}
           >
             Active Jobs
           </button>
           <button
-            className={`py-2 px-4 rounded-md ${activeTab === "posted" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
+            className={`py-2 px-4 font-bold text-xl bg-transparent  ${activeTab === "posted" ? "text-blue-600 border-b-7 border-b-blue-600" : "text-slate-400"}`}
             onClick={() => setActiveTab("posted")}
           >
             Posted Jobs
           </button>
           <button
-            className={`py-2 px-4 rounded-md ${activeTab === "completed" ? "bg-yellow-600 text-white" : "bg-gray-200"}`}
+            className={`py-2 px-4 font-bold text-xl bg-transparent  ${activeTab === "completed" ? "text-yellow-600 border-b-7 border-b-yellow-600": "text-slate-400" }`}
             onClick={() => setActiveTab("completed")}
           >
             Completed Jobs

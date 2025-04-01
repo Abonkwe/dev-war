@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Create_job } from '../CrudOperations/crud';
 
-const townsInCameroon = [
+export const townsInCameroon = [
   "Douala", "Yaoundé", "Bamenda", "Buea", "Limbe", "Kribi", "Garoua", "Maroua",
   "Ngaoundéré", "Ebolowa", "Bafoussam", "Kumba", "Dschang", "Bertoua", "Foumban",
   "Nkongsamba", "Tiko", "Mbalmayo", "Bafia", "Mamfe"

@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import ButtonPrimary from "./ButtonPrimary";
 import { Link, useNavigate } from 'react-router-dom';
+// import {FaBeer} from "react-icons/md"
+import { FaBell, FaUser } from "react-icons/fa";
+import { getCurrentUser } from '../auth/auth';
+// import Fa
 
 const Navbar = () => {
+    const user = getCurrentUser()
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const navigate = useNavigate();
@@ -41,18 +46,45 @@ const Navbar = () => {
                         <Link to="/profile" className="hover:underline">Profile</Link>
                     </li>
                     <li>
-                        <Link to="/notifications" className="hover:underline">Notifications</Link>
+                        <Link to="/about" className="hover:underline">About</Link>
+                    </li>
+                    <li>
+                        <Link to="/faqs" className="hover:underline">FAQs</Link>
                     </li>
                 </ul>
             </div>
-            <div className="postjob hidden md:block">
+            <div className="postjob hidden md:flex md:gap-4 md:items-center">
+                {
+
+                user ? 
+                <>
+           <Link className='bg-[#19995C] p-3  rounded-full flex flex-col' to={"/notification"}>
+           <div className="new-notification h-2 w-2 bg-red-500 self-end rounded-full"></div> 
+           <FaBell style={{ color: "white"}}/>
+           </Link> 
+           <Link className='bg-[#19995C] p-4 rounded-full' to={"/userprofile"}>
+           <FaUser style={{ color: "white"}}/></Link> 
                 <button
                     onClick={handlePostJobClick}
-                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                    className="p-2 bg-[#19995C] border-3 border-[#19995c] text-white rounded hover:bg-green-600"
                 >
                     Post a Job
                 </button>
+                </>:
+                <>
+                <Link to={"/login"}>
+                <button className='bg-[#19995C] font-bold p-3 text-white rounded hover:bg-green-600"'>Login</button>
+               </Link>
+               <Link to={"/signup"}>
+                <button className='px-4 py-2 border-2 border-[#19995C] font-bold rounded hover:bg-green-600"'>Signup</button>
+               </Link>
+                </>
+               
+}
+                
             </div>
+            
+            
             {/* Hamburger Icon for Mobile */}
             <div className="md:hidden">
                 <button onClick={toggleMenu} className="text-gray-500 focus:outline-none">
@@ -79,7 +111,7 @@ const Navbar = () => {
                         <li>
                             <button
                                 onClick={handlePostJobClick}
-                                className="block px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 text-center"
+                                className="block px-4 py-2 bg-[#19995c] text-white rounded hover:bg-green-600 text-center"
                             >
                                 Post a Job
                             </button>

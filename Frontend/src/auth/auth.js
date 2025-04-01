@@ -14,9 +14,8 @@ export const loginUser = async (setLoading,setErrorMessage,email,password)=>{
           email,
           password,
         }),
-      }
-    try {
-        
+    }
+   
         const response = await fetch(`${BASE_URL}/login`,API_OPTIONS);
 
         if (response.ok) {
@@ -24,21 +23,18 @@ export const loginUser = async (setLoading,setErrorMessage,email,password)=>{
 
           // Store user data and token in localStorage
         //   localStorage.setItem('user', JSON.stringify(data.user)); // Store user info
-          localStorage.setItem('token', data.access_token); // Store JWT token
+          localStorage.setItem('acessToken', data.access_token); // Store JWT token
 
         //   // Optionally, you can redirect the user after login
         //   history.push('/dashboard'); // Redirect to dashboard or home page
         return data;
         } else {
           const data = await response.json();
+          localStorage.setItem("accessToken", data.access_token);
           setErrorMessage(data.message || 'Something went wrong. Please try again.');
         }
-      } catch (error) {
-        setErrorMessage('Network error. Please try again.');
-        console.error('Error during login:', error);
-      } finally {
+      
         setLoading(false);
-      }
 };
 export const signupuser = async (name,email,phone, password, setErrorMessage, setLoading)=>{
     const API_OPTIONS = {
@@ -74,3 +70,8 @@ export const signupuser = async (name,email,phone, password, setErrorMessage, se
         return null;
       }
     }
+
+
+export const getCurrentUser =()=>{
+  return localStorage.getItem("accessToken");
+}

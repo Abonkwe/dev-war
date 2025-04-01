@@ -9,6 +9,7 @@ from sqlalchemy import Integer, Text, String, ForeignKey, Boolean, Float, DateTi
 from flask_cors import CORS
 from flask_migrate import Migrate
 from datetime import datetime
+# from flask_cors import 
 import json
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})  # Allow requests from the frontend origin
@@ -309,7 +310,10 @@ def get_user_jobs(user_id):
         "posted_jobs": posted_jobs,
         "taken_jobs": taken_jobs
     }), 200
-
+@app.route("/getuser")
+def getOneUser(req):
+    user = None
+    auth_user = authenticate()
 
 
 

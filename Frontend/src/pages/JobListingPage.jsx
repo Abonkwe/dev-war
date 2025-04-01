@@ -2,11 +2,16 @@ import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import JobCard from "../components/JobCard";
+import { townsInCameroon } from "./PostJob";
+import { getAccessToken, getCurrentUser } from "../auth/auth";
 // Remove the import of local jobs data, you should use the api instead.
 // import jobs from "../data/jobs";
 import { useNavigate } from "react-router-dom";
 
 const JobListingPage = () => {
+
+    
+   
     const [jobs, setJobs] = useState([]); // Store all jobs
     const [filteredJobs, setFilteredJobs] = useState([]);
     const [isFiltered, setIsFiltered] = useState(false);
@@ -130,14 +135,18 @@ const JobListingPage = () => {
                             onChange={handleFilterChange}
                             className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
                         />
-                        <input
-                            type="text"
-                            name="location"
-                            placeholder="Filter by location"
-                            value={filters.location}
-                            onChange={handleFilterChange}
-                            className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                        />
+                       <select
+                                    id="location"
+                                    name="location"
+                                    value={filters.skill}
+                                    onChange={handleFilterChange}
+                                    className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                                  >
+                                    <option value="">Select a town</option>
+                                    {townsInCameroon.map((town, index) => (
+                                      <option key={index} value={town}>{town}</option>
+                                    ))}
+                                  </select>
                         <input
                             type="date"
                             name="datePosted"
@@ -147,17 +156,17 @@ const JobListingPage = () => {
                         />
                         <button
                             onClick={removeAllFilters}
-                            className="bg-green-600 text-white font-bold py-2 px-4 rounded-md hover:bg-green-700 transition duration-200"
+                            className="bg-[#19995c] text-white font-bold py-2 px-4 rounded-md hover:bg-green-700 transition duration-200"
                         >
                             Remove Filters
                         </button>
                     </div>
                 </div>
-                <div className="post-job flex justify-between my-6">
-                    <h1>{filteredJobs.length} Total Jobs Available</h1>
+                <div className="post-job mx-30 flex justify-between my-6">
+                    <h1 className="font-bold text-2xl">{filteredJobs.length} Total Jobs Available</h1>
                     <button
                         onClick={handlePostJobClick}
-                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                        className="px-4 font-bold py-2 bg-[#19995c] text-white rounded hover:bg-green-600"
                     >
                         Post a Job
                     </button>
